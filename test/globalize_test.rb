@@ -168,6 +168,16 @@ class GlobalizeTest < MiniTest::Spec
         untranslated = Untranslated.new(:locale => "Hello, I'm locale.")
         assert_equal "Hello, I'm locale.", untranslated.read_attribute(:locale)
       end
+
+      it "when last argument of fields to translation is 'false' attribute not will be taken from translations" do
+        country = Country.create!(title: "Usa")
+        I18n.locale = :de
+        country.reload
+        country.update_attributes(:title => "Germany")
+        assert_equal "Usa", country.title
+        assert_equal [:de, :en], country.translated_locales
+        assert_equal :de, I18n.locale
+      end
     end
 
     describe 'with reload in after_save callback' do
