@@ -120,6 +120,24 @@ class GlobalizeTest < MiniTest::Spec
       end
     end
 
+    describe '#read_attribute' do
+      it "saves locale for unsaved untranslated model with locale column" do
+        untranslated = Untranslated.new(:locale => "Hello, I'm locale.")
+        assert_equal "Hello, I'm locale.", untranslated.read_attribute(:locale)
+      end
+
+      it "when last argument of fields to translation is 'false' attribute not will be taken from translations" do
+        country = Country.create!(title: "Usa")
+        #binding.pry
+        I18n.locale = :de
+        country.reload
+        country.update_attributes(:title => "Germany")
+        assert_equal "Usa", country.title
+        assert_equal [:de, :en], country.translated_locales
+        assert_equal :de, I18n.locale
+      end
+    end
+
     describe '#reload' do
       it "works with translated attributes" do
         post = Post.create(:title => 'foo')

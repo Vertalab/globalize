@@ -2,6 +2,7 @@ module Globalize
   module ActiveRecord
     module ActMacro
       def translates(*attr_names)
+        attr_names = skip_translation(attr_names) if attr_names.last == false
         options = attr_names.extract_options!
         # Bypass setup_translates! if the initial bootstrapping is done already.
         setup_translates!(options) unless translates?
@@ -78,6 +79,12 @@ module Globalize
 
         before_create :save_translations!
         before_update :save_translations!
+      end
+
+      def skip_translation(attributes)
+        Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[self.class_name.to_sym] = true
+        attributes.pop
+        attributes
       end
     end
 
