@@ -128,12 +128,13 @@ class GlobalizeTest < MiniTest::Spec
 
       it "when last argument of fields to translation is 'false' attribute not will be taken from translations" do
         country = Country.create!(title: "Usa")
-        #binding.pry
+        country.update_column(:title, "China")
         I18n.locale = :de
         country.reload
         country.update_attributes(:title => "Germany")
-        assert_equal "Usa", country.title
+        assert_equal "China", country.title
         assert_equal [:de, :en], country.translated_locales
+        assert_equal ['Usa', 'Germany'], country.translations.pluck(:title)
         assert_equal :de, I18n.locale
       end
     end
