@@ -8,6 +8,16 @@ ActiveRecord::Schema.define do
   create_table :articles, :force => true do |t|
     t.references :author
   end
+  
+  create_table :countries, :force => true do |t|
+    t.string   :title
+  end
+
+  create_table :country_translations, :force => true do |t|
+    t.string     :locale
+    t.references :country
+    t.string     :title
+  end
 
   create_table :article_translations, :force => true do |t|
     t.references :article

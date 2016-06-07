@@ -33,7 +33,15 @@ module Globalize
         options = {:translated => true, :locale => nil}.merge(options)
         return super(name) unless options[:translated]
 
-        if translated?(name)
+        if self.class.translated?(name) && Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[self.class.name.to_sym]
+          if super(name).nil?
+            if (value = globalize.fetch(options[:locale] || Globalize.locale, name))
+              value
+            end
+          else
+            super(name)  
+          end
+        elsif translated?(name)
           if (value = globalize.fetch(options[:locale] || Globalize.locale, name))
             value
           else
