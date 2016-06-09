@@ -159,10 +159,12 @@ module Globalize
       end
 
       def save(*)
+        result = ''
         Globalize.with_locale(read_attribute(:locale) || I18n.default_locale) do
-          toggle_skipping_translation(self)
-          super
+          result = super
         end
+        toggle_skipping_translation(self)
+        result
       end
 
       def column_for_attribute name
