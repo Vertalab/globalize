@@ -46,6 +46,7 @@ module Globalize
         return super(name) unless options[:translated]
 
         if name == :locale
+          toggle_skipping_translation(self)
           self.try(:locale).presence || self.translation.locale
         elsif self.class.translated?(name) && Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[self.class.name.to_sym]
           if super(name).nil?
@@ -159,6 +160,7 @@ module Globalize
 
       def save(*)
         Globalize.with_locale(read_attribute(:locale) || I18n.default_locale) do
+          toggle_skipping_translation(self)
           super
         end
       end
@@ -167,6 +169,13 @@ module Globalize
         return super if translated_attribute_names.exclude?(name)
 
         globalize.send(:column_for_attribute, name)
+      end
+
+      def toggle_skipping_translation(klass)
+        unless Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[klass.class.name.to_sym].nil?
+          Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[klass.class.name.to_sym] = 
+          !Globalize::ActiveRecord::Attributes::SKIP_TRANSLATION[klass.class.name.to_sym]
+        end
       end
 
     protected
